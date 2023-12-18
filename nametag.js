@@ -7,26 +7,32 @@ class NameTag {
     this.phone = null;
     this.nameTag = null;
     this.shape = null;
+    this.active = false;
+    this.activeCount = 0;
+    this.maxActiveCount = 2;
+    this.o = null;
+    this.b = null;
   }
 
-  createDOMElement() {
+  createDOMElement(o, b) {
+    this.o = o;
+    this.b = b;
     this.nameTag = document.createElement("div");
     this.nameTag.className = "name-tag"; //elegantshadow
 
     let name = document.createElement("div");
-    name.className = "name";
+    name.className = this.active ? "name " + this.b : "name";
     name.textContent = this.name;
-    this.nameTag.dataset.name = this.name;
 
     let info = document.createElement("div");
-    info.className = "info";
+    info.className = this.active ? "info " + this.o + " " + this.b : "info";
 
     let sexElement = document.createElement("div");
-    sexElement.className = "sex";
+    sexElement.className = this.active ? "sex " + this.o : "sex";
     sexElement.textContent = this.sex;
 
     let phoneElement = document.createElement("div");
-    phoneElement.className = "phone";
+    phoneElement.className = this.active ? "phone " + this.o : "phone";
     phoneElement.textContent = this.phone;
 
     info.appendChild(sexElement);
@@ -82,6 +88,38 @@ class NameTag {
     this.phone = randomPhoneNum;
   }
 
+  updateClass() {
+    const nameElement = this.nameTag.querySelector(".name");
+    if (nameElement) {
+      nameElement.classList.toggle(this.b, this.active);
+    }
+    const infoElement = this.nameTag.querySelector(".info");
+    if (infoElement) {
+      infoElement.classList.toggle(this.b, this.active);
+      infoElement.classList.toggle(this.o, this.active);
+    }
+    const sexElement = this.nameTag.querySelector(".sex");
+    if (sexElement) {
+      sexElement.classList.toggle(this.b, this.active);
+      sexElement.classList.toggle(this.o, this.active);
+    }
+
+    // Update the active count
+    this.activeCount += this.active ? 1 : -1;
+    if (this.activeCount > this.maxActiveCount) {
+      // If the limit is exceeded, deactivate the instance
+      this.active = false;
+      this.updateClass();
+    }
+  }
+
+  toggleState() {
+    if (this.active || this.activeCount < this.maxActiveCount) {
+      this.active = !this.active;
+      // console.log("toggleStae");
+      this.updateClass(); // Update the class when the state is toggled
+    }
+  }
   drawGraphic() {
     let shapeArr = ["RECT", "ELLIPSE", "TRIANGLE", "X"];
     let sizeArr = ["BIG", "SMALL"];
@@ -94,7 +132,7 @@ class NameTag {
     let set = [set1, set2, set3];
 
     this.shape = new Shape(set[getRandomInt(0, 3)]);
-    createCanvas(this.shape.s * 12, this.shape.s * 8);
+    let rcnv = createCanvas(this.shape.s * 12, this.shape.s * 8);
     this.shape.drawShape();
   }
 }
